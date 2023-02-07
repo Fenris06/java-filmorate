@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import ru.yandex.practicum.filmorate.validation.Validation;
 
@@ -18,11 +19,13 @@ import javax.validation.Valid;
 import javax.validation.ValidationException;
 
 import static org.springframework.http.HttpStatus.*;
+import static ru.yandex.practicum.filmorate.validation.Validation.isLoginUserValidation;
+import static ru.yandex.practicum.filmorate.validation.Validation.setUserLoginValidation;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private int generationId = 1;
+    private Integer generationId = 1;
     private final Map<Integer, User> users = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -33,13 +36,11 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        if(user.getLogin().contains(" ")) {
+        if(isLoginUserValidation(user.getLogin())) {
             log.warn("Login cannot contain spaces : {}", user);
             throw new ValidationException("Login cannot contain spaces");
         }
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
+        setUserLoginValidation(user);
         user.setId(generationId++);
         users.put(user.getId(), user);
         log.info("User create: {}", user);
@@ -48,14 +49,12 @@ public class UserController {
 
     @PutMapping
     public User uppDateUser(@Valid @RequestBody User user) throws ValidationException {
-        if(user.getLogin().contains(" ")) {
+        if(isLoginUserValidation(user.getLogin())) {
             log.warn("Login cannot contain spaces : {}", user);
             throw new ValidationException("Login cannot contain spaces");
         }
         if (users.containsKey(user.getId())) {
-            if (user.getName().isBlank()) {
-                user.setName(user.getEmail());
-            }
+            setUserLoginValidation(user);
             users.replace(user.getId(), user);
             log.info("User update: {}", user);
             return user;

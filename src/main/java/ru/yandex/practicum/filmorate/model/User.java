@@ -15,7 +15,6 @@ public class User {
     @NotBlank(message = "Email is blank!")
     @Email(message = "Email should be valid!")
     private String email;
-    @NotBlank(message = "Login is blank!")
     private String login;
     private String name;
     @Past(message = "Birthday can't be in future!")

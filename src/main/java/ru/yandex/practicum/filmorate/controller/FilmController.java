@@ -2,12 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validation.Validation;
+
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -15,14 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.*;
+
+import static ru.yandex.practicum.filmorate.validation.Validation.isFilmReleaseDateValidation;
 
 
 @RestController
 
 @RequestMapping("/films")
 public class FilmController {
-    private int generationId = 1;
+    private Integer generationId = 1;
     private final Map<Integer, Film> films = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
@@ -33,7 +33,7 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(Validation.getValidateFilmDate())) {
+        if (!isFilmReleaseDateValidation(film)) {
             log.warn("Film release date is before 28.12.1895 : {}", film);
             throw new ValidationException("Film release date is before 28.12.1895");
         }
@@ -45,7 +45,7 @@ public class FilmController {
 
     @PutMapping
     public Film uppDateFilm(@Valid @RequestBody Film film) throws ValidationException {
-        if (film.getReleaseDate().isBefore(Validation.getValidateFilmDate())) {
+        if (!isFilmReleaseDateValidation(film)) {
             log.warn("Film release date is before 28.12.1895 : {}", film);
             throw new ValidationException("Film release date is before 28.12.1895");
         }
