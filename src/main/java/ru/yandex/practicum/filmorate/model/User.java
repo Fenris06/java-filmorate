@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
 
@@ -15,6 +16,7 @@ public class User {
     @NotBlank(message = "Email is blank!")
     @Email(message = "Email should be valid!")
     private String email;
+    @NotEmpty
     private String login;
     private String name;
     @Past(message = "Birthday can't be in future!")
