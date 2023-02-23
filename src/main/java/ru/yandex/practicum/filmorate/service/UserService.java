@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeption.CustomValidationException;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storege.users.UserStorage;
@@ -9,24 +12,34 @@ import ru.yandex.practicum.filmorate.storege.users.UserStorage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.yandex.practicum.filmorate.validation.Validation.isLoginUserValidation;
+import static ru.yandex.practicum.filmorate.validation.Validation.setUserLoginValidation;
+
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserService {
     private final UserStorage userStorage;
-
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     public List<User> getUsers() {
         return userStorage.getUsers();
     }
 
     public User addUser(User user) {
+        if (isLoginUserValidation(user.getLogin())) {
+            log.warn("Login cannot contain spaces : {}", user);
+            throw new CustomValidationException("Login cannot contain spaces");
+        }
+        setUserLoginValidation(user);
         return userStorage.addUser(user);
     }
 
     public User updateUser(User user) {
+        if (isLoginUserValidation(user.getLogin())) {
+            log.warn("Login cannot contain spaces : {}", user);
+            throw new CustomValidationException("Login cannot contain spaces");
+        }
+        setUserLoginValidation(user);
         return userStorage.updateUser(user);
     }
 
@@ -57,9 +70,8 @@ public class UserService {
         List <User> userFriends = new ArrayList<>();
 
         for (Integer userId : user.getFriends()) {
-            if (userStorage.getUser(userId) != null) {
-                userFriends.add(userStorage.getUser(userId));
-            }
+            User userFriend = userStorage.getUser(userId);
+                userFriends.add(userFriend);
         }
         return userFriends;
     }

@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeption.CustomValidationException;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -11,27 +14,34 @@ import ru.yandex.practicum.filmorate.storege.users.UserStorage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static ru.yandex.practicum.filmorate.validation.Validation.isFilmReleaseDateValidation;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-
-    @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
 
     public List<Film> getFilms() {
         return filmStorage.getFilms();
     }
 
     public Film addFilm(Film film) {
+        if (!isFilmReleaseDateValidation(film)) {
+            log.warn("Film release date is before 28.12.1895 : {}", film);
+            throw new CustomValidationException("Film release date is before 28.12.1895");
+        }
         return filmStorage.addFilm(film);
     }
 
     public Film updateFilm(Film film) {
+        if (!isFilmReleaseDateValidation(film)) {
+            log.warn("Film release date is before 28.12.1895 : {}", film);
+            throw new CustomValidationException("Film release date is before 28.12.1895");
+        }
         return filmStorage.updateFilm(film);
     }
 
@@ -58,21 +68,11 @@ public class FilmService {
 
     public List<Film> getPopularFilms(Integer count) {
         LikeComparator likeComparator = new LikeComparator();
-        List<Film> films = new ArrayList<>(filmStorage.getFilms());
-        films.sort(likeComparator);
-        if (count == 10) {
-            if (films.size() <= 10) {
-                return films;
-            } else {
-                return films.subList(0, 9);
-            }
-        } else {
-            if (count <= films.size()) {
-                return films.subList(0, count);
-            } else {
-                return films;
-            }
-        }
+        return filmStorage.getFilms()
+                .stream()
+                .sorted(likeComparator)
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     static class LikeComparator implements Comparator<Film> {

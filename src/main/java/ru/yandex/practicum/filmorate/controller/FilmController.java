@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +20,9 @@ import static ru.yandex.practicum.filmorate.validation.Validation.isFilmReleaseD
 
 @RestController
 @RequestMapping("/films")
+@Slf4j
 public class FilmController {
     private final FilmService filmService;
-
-    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -35,20 +35,12 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) throws CustomValidationException {
-        if (!isFilmReleaseDateValidation(film)) {
-            log.warn("Film release date is before 28.12.1895 : {}", film);
-            throw new CustomValidationException("Film release date is before 28.12.1895");
-        }
+    public Film createFilm(@Valid @RequestBody Film film) {
         return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Film uppDateFilm(@Valid @RequestBody Film film) throws CustomValidationException {
-        if (!isFilmReleaseDateValidation(film)) {
-            log.warn("Film release date is before 28.12.1895 : {}", film);
-            throw new CustomValidationException("Film release date is before 28.12.1895");
-        }
+    public Film uppDateFilm(@Valid @RequestBody Film film)  {
         return filmService.updateFilm(film);
     }
 

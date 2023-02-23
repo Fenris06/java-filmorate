@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storege.users;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,10 +17,10 @@ import java.util.Map;
 import static ru.yandex.practicum.filmorate.validation.Validation.setUserLoginValidation;
 
 @Component
+@Slf4j
 public class InMemoryUserStorage implements UserStorage {
     private Integer generationId = 1;
     private final Map<Integer, User> users = new HashMap<>();
-    private static final Logger log = LoggerFactory.getLogger(InMemoryUserStorage.class);
 
     @Override
     public List<User> getUsers() {
@@ -28,7 +29,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        setUserLoginValidation(user);
         user.setId(generationId++);
         users.put(user.getId(), user);
         log.info("User create: {}", user);
@@ -38,18 +38,12 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (users.containsKey(user.getId())) {
-            setUserLoginValidation(user);
             users.replace(user.getId(), user);
             log.info("User update: {}", user);
             return user;
         }
         log.warn("User not update: {}", user);
         throw new NotFoundException("User not found " + user);
-    }
-
-    @Override
-    public void deleteUsers() {
-        users.clear();
     }
 
     @Override
@@ -64,10 +58,5 @@ public class InMemoryUserStorage implements UserStorage {
             log.warn("User by id not found: {}", id);
             throw new NotFoundException(String.format("User by id %d not found", id));
         }
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.generationId = id;
     }
 }

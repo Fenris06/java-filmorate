@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storege.films;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,12 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
-
-
     private Integer generationId = 1;
     private final Map<Integer, Film> films = new HashMap<>();
-    private static final Logger log = LoggerFactory.getLogger(InMemoryFilmStorage.class);
 
     @Override
     public List<Film> getFilms() {
@@ -30,7 +29,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         film.setId(generationId++);
         films.put(film.getId(), film);
         log.info("Film is create : {}", film);
-        return films.get(film.getId());
+        return film;
     }
 
     @Override
@@ -42,11 +41,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         log.warn("Film not uppDate : {}", film);
         throw new NotFoundException(String.format("Film by id %d not update", film.getId()));
-    }
-
-    @Override
-    public void deleteFilms() {
-        films.clear();
     }
 
     @Override
@@ -62,13 +56,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException(String.format("Film by id %d not found", id));
         }
     }
-
-    @Override
-    public void setId(Integer id) {
-        this.generationId = id;
-    }
-
-
 }
 
 

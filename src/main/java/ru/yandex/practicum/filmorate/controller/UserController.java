@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ import static ru.yandex.practicum.filmorate.validation.Validation.isLoginUserVal
 
 @RestController
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
     private final UserService userService;
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     public UserController(UserService userService) {
@@ -38,20 +39,13 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) throws CustomValidationException {
-        if (isLoginUserValidation(user.getLogin())) {
-            log.warn("Login cannot contain spaces : {}", user);
-            throw new CustomValidationException("Login cannot contain spaces");
-        }
+    public User createUser(@Valid @RequestBody User user) {
         return userService.addUser(user);
     }
 
     @PutMapping
     public User uppDateUser(@Valid @RequestBody User user) throws CustomValidationException {
-        if (isLoginUserValidation(user.getLogin())) {
-            log.warn("Login cannot contain spaces : {}", user);
-            throw new CustomValidationException("Login cannot contain spaces");
-        }
+
         return userService.updateUser(user);
     }
 
