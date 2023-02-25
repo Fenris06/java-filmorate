@@ -1,15 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.TreeSet;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @Builder
 public class User {
     private Integer id;
@@ -21,4 +26,6 @@ public class User {
     private String name;
     @Past(message = "Birthday can't be in future!")
     private LocalDate birthday;
+    @JsonIgnore
+    private final Set<Integer> friends = new TreeSet<>();
 }

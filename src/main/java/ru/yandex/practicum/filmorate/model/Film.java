@@ -1,13 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 ;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
 @Builder
 public class Film {
     private Integer id;
@@ -19,5 +26,9 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveOrZero
     private int duration;
+    @JsonIgnore
+    private final Set<Integer> likes = new TreeSet<>();
+
+
 }
 
