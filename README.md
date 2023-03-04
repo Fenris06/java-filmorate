@@ -41,3 +41,5 @@ Template repository for Filmorate project.
 * **user_id** - первичный ключ и идентификатор пользователя отсылающий к таблице **users**;
 * **friend_id** - идентификатор друга;
 * **status** - статус состояния дружбы;
+
+# sql requests
