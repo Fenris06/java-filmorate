@@ -43,3 +43,9 @@ Template repository for Filmorate project.
 * **status** - статус состояния дружбы;
 
 # sql requests
+
+**Запрос на получения таблици юзеров:**
+```sql
+SELECT*
+FROM users;
+```
