@@ -49,3 +49,8 @@ Template repository for Filmorate project.
 SELECT*
 FROM users;
 ```
+**Запрос на получение таблици фильмов:**
+```sql
+SELECT*
+FROM films;
+```
