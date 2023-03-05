@@ -68,3 +68,4 @@ GROUP BY f.film_id
 ORDER BY  COUNT(l.user_id) DESC
 LIMIT 10;
 ```
+
