@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 # Database diagram
 
-![database diagram](https://github.com/Fenris06/java-filmorate/blob/main/database%20diagram%20of%20progect%20Filmorate.png)
+![database diagram](https://github.com/java-filmorate/blob/main/database%20diagram%20of%20progect%20Filmorate%20new.png)
 
 ### Database diogram description
 **geners:**
@@ -18,7 +18,7 @@ Template repository for Filmorate project.
 **films:**
 содержит основную информацию о фильмах.
 * **film_id** - первичный ключ и идентификатор фильма;
-* **discription** - описание фильма;
+* **description** - описание фильма;
 * **releasedate** - дата выходва фильма;
 * **duration** - продолжительность фильма;
 * **rate** - возрастной рейтинг фильма;
