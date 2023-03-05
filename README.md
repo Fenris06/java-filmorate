@@ -54,3 +54,17 @@ FROM users;
 SELECT*
 FROM films;
 ```
+**Запрос на получение таблици 10 самых популярных фильмов:**
+```sql
+SELECT f.name,
+       f.discription,
+       f.relesedate,
+       f.duration,
+       f.rate,
+       COUNT(l.user_id)
+FROM films as f
+LEFT OUTER JOIN likes AS l ON f.film_id = l.film_id
+GROUP BY f.film_id
+ORDER BY  COUNT(l.user_id) DESC
+LIMIT 10;
+```
