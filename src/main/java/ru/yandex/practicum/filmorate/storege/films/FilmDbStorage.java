@@ -18,8 +18,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 @Primary
@@ -30,7 +29,10 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilms() {
-        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f JOIN rate AS r ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg ON f.film_id = fg.film_id LEFT JOIN genres AS g ON fg.genre_id = g.genre_id";
+        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f JOIN rate AS r " +
+                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg " +
+                "ON f.film_id = fg.film_id LEFT JOIN genres AS g " +
+                "ON fg.genre_id = g.genre_id";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
@@ -73,7 +75,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Integer id) {
-        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f JOIN rate AS r ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg ON f.film_id = fg.film_id LEFT JOIN genres AS g ON fg.genre_id = g.genre_id WHERE f.film_id = ?";
+        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f JOIN rate AS r " +
+                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg " +
+                "ON f.film_id = fg.film_id LEFT JOIN genres AS g ON fg.genre_id = g.genre_id WHERE f.film_id = ?";
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
     }
 
@@ -91,31 +95,37 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        String sqlQuery = "SELECT * FROM films AS f " +
+        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f " +
                 "LEFT JOIN (SELECT film_id, COUNT(user_id) AS film_likes FROM likes GROUP BY film_id) AS l " +
                 "ON f.film_id = l.film_id LEFT JOIN rate AS r " +
-                "ON f.rate_id = r.rate_id ORDER BY film_likes DESC LIMIT ?";
+                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg ON f.film_id = fg.film_id " +
+                "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id ORDER BY film_likes DESC LIMIT ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
     private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
+
         FilmRate mpa = FilmRate.builder().
                 id(rs.getInt("rate_id"))
                 .name(rs.getString("rate_name"))
                 .build();
-
-        Film film = Film.builder().id(rs.getInt("film_id"))
+        Integer filmId = rs.getInt(rs.getInt("film_id"));
+        Film film = Film.builder().id(filmId)
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
                 .mpa(mpa)
                 .build();
+        List<Genre> filmGenres = new ArrayList<>();
         String genre_name = rs.getString("genre_name");
         if (genre_name != null) {
-            film.addFilmGenre(Genre.builder()
+            filmGenres.add(Genre.builder()
                     .id(rs.getInt("genre_id"))
                     .name(genre_name).build());
+        }
+        for (Genre genre : filmGenres) {
+            film.addFilmGenre(genre);
         }
         return film;
     }
