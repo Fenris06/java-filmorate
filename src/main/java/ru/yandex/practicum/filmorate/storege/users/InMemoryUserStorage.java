@@ -59,4 +59,24 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException(String.format("User by id %d not found", id));
         }
     }
+
+    @Override
+    public void addUserFriends(Integer id, Integer friendId) {
+
+    }
+
+    @Override
+    public void deleteUserFriends(Integer id, Integer friendId) {
+
+    }
+
+    @Override
+    public List<User> getUserFriends(Integer id) {
+        return null;
+    }
+
+    @Override
+    public List<User> getCommonFriends(Integer id, Integer otherId) {
+        return null;
+    }
 }

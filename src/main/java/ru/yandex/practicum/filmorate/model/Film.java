@@ -1,12 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
 ;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -26,9 +25,14 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveOrZero
     private int duration;
-    @JsonIgnore
-    private final Set<Integer> likes = new TreeSet<>();
+    @NotNull
+    private int rate;
+    @NotNull
+    private FilmRate mpa;
+    private final List<Genre> genres = new ArrayList<>();
 
-
+public void addFilmGenre(Genre genre) {
+    genres.add(genre);
+}
 }
 

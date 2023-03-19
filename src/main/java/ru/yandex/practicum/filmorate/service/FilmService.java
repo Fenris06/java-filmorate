@@ -42,43 +42,35 @@ public class FilmService {
             log.warn("Film release date is before 28.12.1895 : {}", film);
             throw new CustomValidationException("Film release date is before 28.12.1895");
         }
+        if(getFilm(film.getId()).getId() == film.getId())
         return filmStorage.updateFilm(film);
+        else {
+            throw new NotFoundException("film not found");
+        }
     }
 
     public Film getFilm(Integer id) {
-        return filmStorage.getFilm(id);
+        try {
+            return filmStorage.getFilm(id);
+        } catch (Exception e) {
+            throw new NotFoundException("film not found");
+        }
+
     }
 
     public void setFilmLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-        User user = userStorage.getUser(userId);
-        film.getLikes().add(user.getId());
+        filmStorage.setFilmLike(filmId, userId);
     }
 
     public void deleteFilmLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilm(filmId);
-        if (userId != null) {
-            if (film.getLikes().contains(userId)) {
-                film.getLikes().remove(userId);
-            } else {
-                throw new NotFoundException(String.format("User like id %d not found", userId));
-            }
+        if (filmId >= 1 && userId >= 1) {
+            filmStorage.deleteFilmLike(filmId, userId);
+        } else {
+            throw new NotFoundException("id must be positive");
         }
     }
-
     public List<Film> getPopularFilms(Integer count) {
-        LikeComparator likeComparator = new LikeComparator();
-        return filmStorage.getFilms()
-                .stream()
-                .sorted(likeComparator)
-                .limit(count)
-                .collect(Collectors.toList());
+      return filmStorage.getPopularFilms(count);
     }
 
-    static class LikeComparator implements Comparator<Film> {
-        @Override
-        public int compare(Film o1, Film o2) {
-            return Integer.compare(o2.getLikes().size(), o1.getLikes().size());
-        }
-    }
 }
