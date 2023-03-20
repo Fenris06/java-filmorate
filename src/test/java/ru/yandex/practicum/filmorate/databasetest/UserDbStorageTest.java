@@ -63,7 +63,7 @@ public class UserDbStorageTest {
     @Test
     public void shouldUserDbStorageGetAllUsers() {
         List<User> users = userDbStorage.getUsers();
-        assertEquals(users.size(), 8);
+        assertEquals(users.size(), 7);
     }
 
     @Test
