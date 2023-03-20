@@ -42,20 +42,11 @@ public class FilmService {
             log.warn("Film release date is before 28.12.1895 : {}", film);
             throw new CustomValidationException("Film release date is before 28.12.1895");
         }
-        if(getFilm(film.getId()).getId() == film.getId())
         return filmStorage.updateFilm(film);
-        else {
-            throw new NotFoundException("film not found");
-        }
     }
 
     public Film getFilm(Integer id) {
-        try {
-            return filmStorage.getFilm(id);
-        } catch (Exception e) {
-            throw new NotFoundException("film not found");
-        }
-
+        return filmStorage.getFilm(id);
     }
 
     public void setFilmLike(Integer filmId, Integer userId) {

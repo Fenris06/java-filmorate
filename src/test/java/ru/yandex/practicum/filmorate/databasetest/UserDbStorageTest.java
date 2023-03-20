@@ -1,12 +1,16 @@
 package ru.yandex.practicum.filmorate.databasetest;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.FilmRate;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storege.films.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storege.users.UserDbStorage;
 
 import java.time.LocalDate;
@@ -59,7 +63,7 @@ public class UserDbStorageTest {
     @Test
     public void shouldUserDbStorageGetAllUsers() {
         List<User> users = userDbStorage.getUsers();
-        assertEquals(users.size(), 7);
+        assertEquals(users.size(), 8);
     }
 
     @Test
@@ -164,4 +168,6 @@ public class UserDbStorageTest {
         assertEquals(commonFriends.get(0).getEmail(), user3.getEmail());
         assertEquals(commonFriends.get(0).getBirthday(), user3.getBirthday());
     }
+
+
 }
