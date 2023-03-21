@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -65,7 +66,12 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User getUser(Integer id) {
         String sqlQuery = "SELECT * FROM users WHERE user_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+        List<User> users = jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
+        if(users.isEmpty()) {
+            throw new NotFoundException("User not found");
+        } else {
+            return users.get(0);
+        }
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {

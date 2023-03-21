@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ch.qos.logback.core.joran.conditional.IfAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,46 +43,48 @@ public class UserService {
             throw new CustomValidationException("Login cannot contain spaces");
         }
         setUserLoginValidation(user);
-        if(getUser(user.getId()).getId() == user.getId()) {
+        if (getUser(user.getId()) != null) {
             return userStorage.updateUser(user);
         } else {
-            throw new NotFoundException("user id not found");
+            throw new NotFoundException("user not found");
         }
     }
 
-    public User getUser(Integer id) { // пытаюсь проверить юзера на null но вместо
-                               // NotfoundExeption возвращается exception c 500 статусом при этом аналогичная провера классе
-                              // filmServis проходит ок
-        User user = userStorage.getUser(id);
-       if(user != null) {
-           return user;
-       } else {
-           throw new NotFoundException("user not found");
-       }
+    public User getUser(Integer id) {
+        return userStorage.getUser(id);
     }
 
     public void addUserFriends(Integer id, Integer friendId) {
-        try {
+        if (getUser(id) != null && getUser(friendId) != null)
             userStorage.addUserFriends(id, friendId);
-        } catch (Exception e) {
+        else {
             throw new NotFoundException("user not found");
         }
     }
 
     public void deleteUserFriends(Integer id, Integer friendId) {
-        try {
+        if (getUser(id) != null && getUser(friendId) != null) {
             userStorage.deleteUserFriends(id, friendId);
-        } catch (Exception e) {
+        } else {
             throw new NotFoundException("user not found");
         }
     }
 
     public List<User> getUserFriends(Integer id) {
-        return userStorage.getUserFriends(id);
+        if (getUser(id) != null) {
+            return userStorage.getUserFriends(id);
+        } else {
+            throw new NotFoundException("user not found");
+        }
     }
 
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-        return userStorage.getCommonFriends(id, otherId);
+        if (getUser(id) != null && getUser(otherId) != null) {
+            return userStorage.getCommonFriends(id, otherId);
+
+        } else {
+            throw new NotFoundException("user not found");
+        }
     }
 }
 
