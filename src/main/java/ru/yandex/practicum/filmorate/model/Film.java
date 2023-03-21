@@ -31,8 +31,8 @@ public class Film {
     private FilmRate mpa;
     private final List<Genre> genres = new ArrayList<>();
 
-public void addFilmGenre(List<Genre> genres) {
-    genres.addAll(genres);
+public void addFilmGenre(List<Genre> filmGenre) {
+    genres.addAll(filmGenre);
 }
 }
 

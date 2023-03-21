@@ -25,9 +25,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilms() {
-        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f JOIN rate AS r " +
+        String sqlQuery = "SELECT f.*, r.rate_name FROM films AS f JOIN rate AS r " +
                 "ON f.rate_id = r.rate_id";
-
         return crateFilmsFromBd(sqlQuery);
     }
 
@@ -70,9 +69,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Integer id) {
-        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f JOIN rate AS r " +
-                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg " +
-                "ON f.film_id = fg.film_id LEFT JOIN genres AS g ON fg.genre_id = g.genre_id WHERE f.film_id = " + id;
+        String sqlQuery = "SELECT f.*, r.rate_name FROM films AS f JOIN rate AS r " +
+                "ON f.rate_id = r.rate_id WHERE f.film_id = " + id;
 
         List<Film> films = crateFilmsFromBd(sqlQuery);
         if (!films.isEmpty()) {
@@ -97,11 +95,10 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(Integer count) {
-        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f " +
+        String sqlQuery = "SELECT f.*, r.rate_name FROM films AS f " +
                 "LEFT JOIN (SELECT film_id, COUNT(user_id) AS film_likes FROM likes GROUP BY film_id) AS l " +
                 "ON f.film_id = l.film_id LEFT JOIN rate AS r " +
-                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg ON f.film_id = fg.film_id " +
-                "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id ORDER BY film_likes DESC LIMIT " + count;
+                "ON f.rate_id = r.rate_id ORDER BY film_likes DESC LIMIT " + count;
 
         return crateFilmsFromBd(sqlQuery);
     }
@@ -169,6 +166,32 @@ public class FilmDbStorage implements FilmStorage {
 //                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg " +
 //                "ON f.film_id = fg.film_id LEFT JOIN genres AS g " +
 //                "ON fg.genre_id = g.genre_id";
+//
+//        return crateFilmsFromBd(sqlQuery);
+//    }
+
+//    @Override
+//    public Film getFilm(Integer id) {
+//        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f JOIN rate AS r " +
+//                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg " +
+//                "ON f.film_id = fg.film_id LEFT JOIN genres AS g ON fg.genre_id = g.genre_id WHERE f.film_id = " + id;
+//
+//        List<Film> films = crateFilmsFromBd(sqlQuery);
+//        if (!films.isEmpty()) {
+//            return films.get(0);
+//        } else {
+//            throw new NotFoundException("film not found");
+//        }
+//
+//    }
+
+//    @Override
+//    public List<Film> getPopularFilms(Integer count) {
+//        String sqlQuery = "SELECT f.*, r.rate_name, g.genre_id, g.genre_name FROM films AS f " +
+//                "LEFT JOIN (SELECT film_id, COUNT(user_id) AS film_likes FROM likes GROUP BY film_id) AS l " +
+//                "ON f.film_id = l.film_id LEFT JOIN rate AS r " +
+//                "ON f.rate_id = r.rate_id LEFT JOIN films_genres AS fg ON f.film_id = fg.film_id " +
+//                "LEFT JOIN genres AS g ON fg.genre_id = g.genre_id ORDER BY film_likes DESC LIMIT " + count;
 //
 //        return crateFilmsFromBd(sqlQuery);
 //    }

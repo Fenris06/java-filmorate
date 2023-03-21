@@ -49,28 +49,31 @@ public class UserService {
         }
     }
 
-    public User getUser(Integer id) {
-       try {
-           return userStorage.getUser(id);
-       } catch (EmptyResultDataAccessException e) {
+    public User getUser(Integer id) { // пытаюсь проверить юзера на null но вместо
+                               // NotfoundExeption возвращается exception c 500 статусом при этом аналогичная провера классе
+                              // filmServis проходит ок
+        User user = userStorage.getUser(id);
+       if(user != null) {
+           return user;
+       } else {
            throw new NotFoundException("user not found");
        }
     }
 
     public void addUserFriends(Integer id, Integer friendId) {
-       try {
-           userStorage.addUserFriends(id, friendId);
-       } catch (Exception e) {
-           throw new NotFoundException("user not found");
-       }
+        try {
+            userStorage.addUserFriends(id, friendId);
+        } catch (Exception e) {
+            throw new NotFoundException("user not found");
+        }
     }
 
     public void deleteUserFriends(Integer id, Integer friendId) {
-       try {
-           userStorage.deleteUserFriends(id, friendId);
-       } catch (Exception e) {
-           throw new NotFoundException("user not found");
-       }
+        try {
+            userStorage.deleteUserFriends(id, friendId);
+        } catch (Exception e) {
+            throw new NotFoundException("user not found");
+        }
     }
 
     public List<User> getUserFriends(Integer id) {
@@ -81,3 +84,4 @@ public class UserService {
         return userStorage.getCommonFriends(id, otherId);
     }
 }
+

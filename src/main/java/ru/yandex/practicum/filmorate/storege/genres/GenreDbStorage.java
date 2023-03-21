@@ -37,7 +37,7 @@ public class GenreDbStorage implements GenreStorage {
     public Map<Integer, List<Genre>> getFilmsGenres(List<Integer> filmsId) {
         Map<Integer, List<Genre>> filmsGenres = new HashMap<>();
         SqlParameterSource source = new MapSqlParameterSource("filmsId", filmsId);
-        String sqlQuery = "SELECT * FROM films_genres AS fg LEFT JOINT genres AS g ON fg.genres_id = g.genres_id " +
+        String sqlQuery = "SELECT * FROM films_genres AS fg LEFT JOIN genres AS g ON fg.genre_id = g.genre_id " +
                 "WHERE fg.film_id IN (:filmsId)";
         NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(jdbcTemplate);
         template.query(sqlQuery, source, rs -> {
@@ -49,9 +49,11 @@ public class GenreDbStorage implements GenreStorage {
                             .id(rs.getInt("genre_id"))
                             .name(genreName).build());
                 } else {
-                    filmsGenres.put(filmId, List.of(Genre.builder()
+                    List<Genre> genres = new ArrayList<>();
+                    genres.add(Genre.builder()
                             .id(rs.getInt("genre_id"))
-                            .name(genreName).build()));
+                            .name(genreName).build());
+                    filmsGenres.put(filmId, genres);
                 }
             }
         });
@@ -65,6 +67,8 @@ public class GenreDbStorage implements GenreStorage {
                 .build();
 
     }
+
+
 
 }
 

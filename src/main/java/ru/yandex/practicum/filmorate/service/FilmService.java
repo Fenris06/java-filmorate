@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.storege.films.FilmStorage;
 import ru.yandex.practicum.filmorate.storege.genres.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storege.users.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.validation.Validation.isFilmReleaseDateValidation;
@@ -27,6 +24,8 @@ import static ru.yandex.practicum.filmorate.validation.Validation.isFilmReleaseD
 public class FilmService {
     private final FilmStorage filmStorage;
     private final GenreDbStorage genreDbStorage;
+
+    private final UserService userService;
 
     public List<Film> getFilms() {
         List<Film> films = filmStorage.getFilms();
@@ -50,7 +49,8 @@ public class FilmService {
             log.warn("Film release date is before 28.12.1895 : {}", film);
             throw new CustomValidationException("Film release date is before 28.12.1895");
         }
-        return filmStorage.addFilm(film);
+
+        return getFilm(filmStorage.addFilm(film).getId());
     }
 
     public Film updateFilm(Film film) {
@@ -58,27 +58,55 @@ public class FilmService {
             log.warn("Film release date is before 28.12.1895 : {}", film);
             throw new CustomValidationException("Film release date is before 28.12.1895");
         }
-        return filmStorage.updateFilm(film);
+        if (getFilm(film.getId()) != null) {
+            return getFilm(filmStorage.updateFilm(film).getId());
+        } else {
+            throw new NotFoundException("Film not found");
+        }
     }
-
     public Film getFilm(Integer id) {
-        return filmStorage.getFilm(id);
+        Film film = filmStorage.getFilm(id);
+        List<Integer> filmIds = new ArrayList<>();
+        filmIds.add(film.getId());
+        Map<Integer, List<Genre>> filmGenres = genreDbStorage.getFilmsGenres(filmIds);
+        List<Genre> newGenre = new ArrayList<>();
+        for (List<Genre> genres : filmGenres.values()) {
+            film.addFilmGenre(genres);
+        }
+
+       return film;
     }
 
     public void setFilmLike(Integer filmId, Integer userId) {
-        filmStorage.setFilmLike(filmId, userId);
+        if (getFilm(filmId) != null && userService.getUser(userId) != null) {
+            filmStorage.setFilmLike(filmId, userId);
+        } else {
+            throw new NotFoundException("user or film not found");
+        }
     }
-
     public void deleteFilmLike(Integer filmId, Integer userId) {
-        if (filmId >= 1 && userId >= 1) {
+        if (getFilm(filmId) != null && userService.getUser(userId) != null) {
             filmStorage.deleteFilmLike(filmId, userId);
         } else {
-            throw new NotFoundException("id must be positive");
+            throw new NotFoundException("user or film not found");
         }
     }
 
     public List<Film> getPopularFilms(Integer count) {
-        return filmStorage.getPopularFilms(count);
+        List<Film> films = filmStorage.getPopularFilms(count);
+        List<Integer> filmIds = new ArrayList<>();
+        if (!films.isEmpty()) {
+            for (Film film : films) {
+                filmIds.add(film.getId());
+            }
+            Map<Integer, List<Genre>> filmGenres = genreDbStorage.getFilmsGenres(filmIds);
+            for (Film film : films) {
+                if (filmGenres.containsKey(film.getId())) {
+                    film.addFilmGenre(filmGenres.get(film.getId()));
+                }
+            }
+        }
+        return films;
     }
 
 }
