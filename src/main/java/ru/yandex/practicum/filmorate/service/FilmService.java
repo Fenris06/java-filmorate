@@ -7,13 +7,16 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.CustomValidationException;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storege.films.FilmStorage;
+import ru.yandex.practicum.filmorate.storege.genres.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storege.users.UserStorage;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.validation.Validation.isFilmReleaseDateValidation;
@@ -23,10 +26,23 @@ import static ru.yandex.practicum.filmorate.validation.Validation.isFilmReleaseD
 @Slf4j
 public class FilmService {
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final GenreDbStorage genreDbStorage;
 
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        List<Film> films = filmStorage.getFilms();
+        List<Integer> filmIds = new ArrayList<>();
+        if (!films.isEmpty()) {
+            for (Film film : films) {
+                filmIds.add(film.getId());
+            }
+            Map<Integer, List<Genre>> filmGenres = genreDbStorage.getFilmsGenres(filmIds);
+            for (Film film : films) {
+                if (filmGenres.containsKey(film.getId())) {
+                    film.addFilmGenre(filmGenres.get(film.getId()));
+                }
+            }
+        }
+        return films;
     }
 
     public Film addFilm(Film film) {
@@ -60,8 +76,9 @@ public class FilmService {
             throw new NotFoundException("id must be positive");
         }
     }
+
     public List<Film> getPopularFilms(Integer count) {
-      return filmStorage.getPopularFilms(count);
+        return filmStorage.getPopularFilms(count);
     }
 
 }
