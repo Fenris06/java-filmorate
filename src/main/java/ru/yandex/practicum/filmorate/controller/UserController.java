@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.CustomValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -13,6 +14,7 @@ import java.util.List;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 
 import static ru.yandex.practicum.filmorate.validation.Validation.isLoginUserValidation;
@@ -56,7 +58,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public Integer deleteFriend(@PathVariable("id") Integer id, @PathVariable("friendId") Integer friendId) {
+    public Integer deleteFriend(@PathVariable("id")  Integer id, @PathVariable("friendId")  Integer friendId) {
         userService.deleteUserFriends(id, friendId);
         return friendId;
     }

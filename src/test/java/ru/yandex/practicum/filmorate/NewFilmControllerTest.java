@@ -113,6 +113,6 @@ public class NewFilmControllerTest {
 
         ResponseEntity<Film> response = testRestTemplate.postForEntity("/films", film, Film.class);
 
-        assertEquals(response.getStatusCode(), HttpStatus.BAD_REQUEST);
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
+import ch.qos.logback.core.joran.conditional.IfAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeption.CustomValidationException;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
@@ -14,6 +16,7 @@ import java.util.List;
 
 import static ru.yandex.practicum.filmorate.validation.Validation.isLoginUserValidation;
 import static ru.yandex.practicum.filmorate.validation.Validation.setUserLoginValidation;
+
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +43,11 @@ public class UserService {
             throw new CustomValidationException("Login cannot contain spaces");
         }
         setUserLoginValidation(user);
-        return userStorage.updateUser(user);
+        if (getUser(user.getId()) != null) {
+            return userStorage.updateUser(user);
+        } else {
+            throw new NotFoundException("user not found");
+        }
     }
 
     public User getUser(Integer id) {
@@ -48,44 +55,36 @@ public class UserService {
     }
 
     public void addUserFriends(Integer id, Integer friendId) {
-        User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
+        if (getUser(id) != null && getUser(friendId) != null)
+            userStorage.addUserFriends(id, friendId);
+        else {
+            throw new NotFoundException("user not found");
+        }
     }
 
     public void deleteUserFriends(Integer id, Integer friendId) {
-        User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(friendId);
-        if (user.getFriends().contains(friendId)) {
-            user.getFriends().remove(friendId);
-            friend.getFriends().remove(id);
+        if (getUser(id) != null && getUser(friendId) != null) {
+            userStorage.deleteUserFriends(id, friendId);
         } else {
-            throw new NotFoundException(String.format("This user id %d is not added as a friends", friendId));
+            throw new NotFoundException("user not found");
         }
     }
 
     public List<User> getUserFriends(Integer id) {
-        User user = userStorage.getUser(id);
-        List <User> userFriends = new ArrayList<>();
-
-        for (Integer userId : user.getFriends()) {
-            User userFriend = userStorage.getUser(userId);
-                userFriends.add(userFriend);
+        if (getUser(id) != null) {
+            return userStorage.getUserFriends(id);
+        } else {
+            throw new NotFoundException("user not found");
         }
-        return userFriends;
     }
 
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-        User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(otherId);
-        List<User> commonFriends = new ArrayList<>();
+        if (getUser(id) != null && getUser(otherId) != null) {
+            return userStorage.getCommonFriends(id, otherId);
 
-        for (Integer userId : user.getFriends()) {
-            if (friend.getFriends().contains(userId)) {
-                commonFriends.add(userStorage.getUser(userId));
-            }
+        } else {
+            throw new NotFoundException("user not found");
         }
-        return commonFriends;
     }
 }
+

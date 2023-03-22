@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.CustomValidationException;
 import ru.yandex.practicum.filmorate.exeption.NotFoundException;
@@ -13,6 +14,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 
@@ -68,5 +70,4 @@ public class FilmController {
         }
         return filmService.getPopularFilms(count);
     }
-
 }
