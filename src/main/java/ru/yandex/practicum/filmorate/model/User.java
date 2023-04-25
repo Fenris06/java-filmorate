@@ -28,4 +28,5 @@ public class User {
     private LocalDate birthday;
     @JsonIgnore
     private final Set<Integer> friends = new TreeSet<>();
+    private String string;
 }
